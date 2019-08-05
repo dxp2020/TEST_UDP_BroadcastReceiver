@@ -22,16 +22,18 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import cn.zelkova.zp.IServiceBinder;
+import cn.zelkova.zp.Book;
+import cn.zelkova.zp.BookManager;
 import cn.zelkova.zp.service.LocalService;
 
 public class MainActivity extends FragmentActivity {
 
     private String hostName = "255.255.255.255";
+    private BookManager bookManager;
+    private Book book;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,26 +55,40 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        findViewById(R.id.btn_aidl_set).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bookManager!=null&&book!=null){
+                    try {
+                        bookManager.setBookName(book,"水浒传");
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         findViewById(R.id.btn_aidl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 bindService(new Intent(MainActivity.this, LocalService.class), new ServiceConnection() {
+
                     @Override
                     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                         try {
-                            int serviceStatus = IServiceBinder.Stub.asInterface(iBinder).getServiceStatus();
-                            Toast.makeText(MainActivity.this,"serviceStatus-->"+serviceStatus,Toast.LENGTH_SHORT).show();
+                            bookManager = BookManager.Stub.asInterface(iBinder);
+                            book = bookManager.getBook();
+                            Toast.makeText(MainActivity.this,"book-->"+book.getName(),Toast.LENGTH_SHORT).show();
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
-
                     }
 
                     @Override
                     public void onServiceDisconnected(ComponentName componentName) {
                         Toast.makeText(MainActivity.this,"断开-->"+componentName.getClassName(),Toast.LENGTH_SHORT).show();
-
                     }
+
                 }, BIND_AUTO_CREATE);
             }
         });

@@ -52,6 +52,15 @@
             android:layout_weight="1"
             />
 
+        <Button
+            android:id="@+id/btn_aidl_set"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:text="修改值"
+            android:layout_weight="1"
+            />
+
     </LinearLayout>
 
     <ScrollView
